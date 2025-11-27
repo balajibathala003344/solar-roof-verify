@@ -49,7 +49,7 @@ const statusConfig: Record<ApplicationStatus, {
 };
 
 const ApplicationCard = ({ application, onClick, showUserInfo = false }: ApplicationCardProps) => {
-  const status = statusConfig[application.status];
+  const status = statusConfig[application.status] || statusConfig.pending;
   const StatusIcon = status.icon;
 
   return (
