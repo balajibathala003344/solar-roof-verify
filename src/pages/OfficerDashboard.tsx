@@ -126,7 +126,7 @@ const OfficerDashboard = () => {
 
   const regions = [...new Set(applications.map(a => a.region))].filter(Boolean);
 
-  if (authLoading || loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -154,6 +154,20 @@ const OfficerDashboard = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+          {loading ? (
+            <>
+              {[...Array(5)].map((_, i) => (
+                <Card key={i}>
+                  <CardContent className="p-4 text-center">
+                    <div className="h-6 w-6 mx-auto mb-2 bg-muted animate-pulse rounded" />
+                    <div className="h-8 w-12 mx-auto mb-1 bg-muted animate-pulse rounded" />
+                    <div className="h-3 w-16 mx-auto bg-muted animate-pulse rounded" />
+                  </CardContent>
+                </Card>
+              ))}
+            </>
+          ) : (
+            <>
           <Card>
             <CardContent className="p-4 text-center">
               <FileText className="h-6 w-6 mx-auto mb-2 text-primary" />
@@ -189,6 +203,8 @@ const OfficerDashboard = () => {
               <p className="text-xs text-muted-foreground">Rejected</p>
             </CardContent>
           </Card>
+            </>
+          )}
         </div>
 
         {/* Filters */}
@@ -244,7 +260,26 @@ const OfficerDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="max-h-[600px] overflow-y-auto space-y-3">
-              {filteredApps.length === 0 ? (
+              {loading ? (
+                [...Array(4)].map((_, i) => (
+                  <Card key={i} className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <div className="h-5 w-20 bg-muted animate-pulse rounded" />
+                          <div className="h-5 w-24 bg-muted animate-pulse rounded-full" />
+                        </div>
+                        <div className="h-4 w-48 bg-muted animate-pulse rounded" />
+                        <div className="flex gap-4">
+                          <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                          <div className="h-4 w-28 bg-muted animate-pulse rounded" />
+                        </div>
+                      </div>
+                      <div className="w-20 h-20 bg-muted animate-pulse rounded-lg flex-shrink-0" />
+                    </div>
+                  </Card>
+                ))
+              ) : filteredApps.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">
                   No applications found
                 </p>
