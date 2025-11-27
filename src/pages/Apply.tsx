@@ -9,6 +9,16 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { 
   Upload, 
   MapPin, 
@@ -34,6 +44,7 @@ const Apply = () => {
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   
@@ -91,7 +102,7 @@ const Apply = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!user || !userProfile) {
@@ -101,6 +112,13 @@ const Apply = () => {
 
     if (!validateForm()) return;
 
+    setShowConfirmDialog(true);
+  };
+
+  const confirmSubmit = async () => {
+    if (!user || !userProfile) return;
+    
+    setShowConfirmDialog(false);
     setLoading(true);
 
     try {
@@ -347,6 +365,53 @@ const Apply = () => {
       </main>
 
       <Footer />
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Submission</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4">
+                <p>Please review your application details before submitting:</p>
+                <div className="bg-muted p-4 rounded-lg space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Sample ID:</span>
+                    <span className="font-medium text-foreground">{formData.sampleId}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Coordinates:</span>
+                    <span className="font-medium text-foreground">{formData.latitude}, {formData.longitude}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Region:</span>
+                    <span className="font-medium text-foreground">{formData.region}</span>
+                  </div>
+                  {formData.address && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Address:</span>
+                      <span className="font-medium text-foreground truncate max-w-[200px]">{formData.address}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Image:</span>
+                    <span className="font-medium text-foreground">{imageFile ? 'Attached' : 'None'}</span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Once submitted, your application will be processed by our AI verification system.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmSubmit} className="solar-gradient">
+              Submit Application
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
