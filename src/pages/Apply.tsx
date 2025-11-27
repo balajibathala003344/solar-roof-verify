@@ -145,10 +145,11 @@ const Apply = () => {
       });
 
       navigate('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Submission error:', error);
       toast({
         title: 'Submission Failed',
-        description: 'Could not submit your application. Please try again.',
+        description: error?.message || 'Could not submit your application. Please try again.',
         variant: 'destructive',
       });
     } finally {

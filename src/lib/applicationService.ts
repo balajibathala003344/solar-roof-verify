@@ -40,11 +40,16 @@ export const createApplication = async (
 ): Promise<string> => {
   let imageUrl: string | undefined;
 
-  // Upload image if provided
+  // Upload image if provided (skip if storage fails)
   if (data.imageFile) {
-    const imageRef = storageRef(storage, `applications/${userId}/${Date.now()}_${data.imageFile.name}`);
-    await uploadBytes(imageRef, data.imageFile);
-    imageUrl = await getDownloadURL(imageRef);
+    try {
+      const imageRef = storageRef(storage, `applications/${userId}/${Date.now()}_${data.imageFile.name}`);
+      await uploadBytes(imageRef, data.imageFile);
+      imageUrl = await getDownloadURL(imageRef);
+    } catch (storageError) {
+      console.warn('Image upload failed, continuing without image:', storageError);
+      // Continue without image if upload fails
+    }
   }
 
   const applicationsRef = ref(database, 'applications');
