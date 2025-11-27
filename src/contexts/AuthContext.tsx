@@ -54,6 +54,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const snapshot = await get(profileRef);
         if (snapshot.exists()) {
           setUserProfile(snapshot.val());
+        } else {
+          // Create a default profile if one doesn't exist
+          const defaultProfile: UserProfile = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+            role: 'user',
+            region: '',
+            createdAt: new Date().toISOString()
+          };
+          await set(profileRef, defaultProfile);
+          setUserProfile(defaultProfile);
         }
       } else {
         setUserProfile(null);
