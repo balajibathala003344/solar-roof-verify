@@ -1,6 +1,5 @@
 import { ref, push, set, get, update, onValue, off, query, orderByChild, equalTo } from 'firebase/database';
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { database, storage } from './firebase';
+import { database } from './firebase';
 import { runSolarDetection, DetectionResult } from './aiDetection';
 
 export type ApplicationStatus = 'pending' | 'processing' | 'ai_completed' | 'approved' | 'rejected';
@@ -13,17 +12,27 @@ export interface Application {
   sampleId: string;
   latitude: number;
   longitude: number;
-  address?: string;
+  address: string;
   region: string;
-  imageUrl?: string;
+  imageUrl: string;
   status: ApplicationStatus;
   aiResult?: DetectionResult;
-  officerNotes?: string;
-  reviewedBy?: string;
-  reviewedAt?: string;
+  officerNotes: string;
+  reviewedBy: string;
+  reviewedAt: string;
   createdAt: string;
   updatedAt: string;
 }
+
+// Convert File to base64 data URL
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+};
 
 export const createApplication = async (
   userId: string,
@@ -38,36 +47,39 @@ export const createApplication = async (
     imageFile?: File;
   }
 ): Promise<string> => {
-  let imageUrl: string | undefined;
+  let imageUrl = '';
 
-  // Upload image if provided (skip if storage fails)
+  // Convert image to base64 if provided
   if (data.imageFile) {
     try {
-      const imageRef = storageRef(storage, `applications/${userId}/${Date.now()}_${data.imageFile.name}`);
-      await uploadBytes(imageRef, data.imageFile);
-      imageUrl = await getDownloadURL(imageRef);
-    } catch (storageError) {
-      console.warn('Image upload failed, continuing without image:', storageError);
-      // Continue without image if upload fails
+      imageUrl = await fileToBase64(data.imageFile);
+    } catch (error) {
+      console.warn('Image conversion failed:', error);
     }
   }
 
   const applicationsRef = ref(database, 'applications');
   const newAppRef = push(applicationsRef);
   
-  const application: Omit<Application, 'id'> = {
+  const now = new Date().toISOString();
+  
+  // Create application object with NO undefined values
+  const application = {
     userId,
     userName,
     userEmail,
     sampleId: data.sampleId,
     latitude: data.latitude,
     longitude: data.longitude,
-    address: data.address,
+    address: data.address || '',
     region: data.region,
     imageUrl,
-    status: 'pending',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    status: 'pending' as ApplicationStatus,
+    officerNotes: '',
+    reviewedBy: '',
+    reviewedAt: '',
+    createdAt: now,
+    updatedAt: now
   };
 
   await set(newAppRef, application);
@@ -97,10 +109,30 @@ export const processApplication = async (applicationId: string): Promise<void> =
     app.longitude
   );
 
+  // Ensure AI result has no undefined values
+  const cleanAiResult = {
+    sample_id: result.sample_id,
+    lat: result.lat,
+    lon: result.lon,
+    has_solar: result.has_solar,
+    confidence: result.confidence,
+    panel_count_est: result.panel_count_est,
+    pv_area_sqm_est: result.pv_area_sqm_est,
+    capacity_kw_est: result.capacity_kw_est,
+    qc_status: result.qc_status,
+    qc_notes: result.qc_notes || [],
+    bbox_or_mask: result.bbox_or_mask || '',
+    image_metadata: {
+      source: result.image_metadata?.source || 'Unknown',
+      capture_date: result.image_metadata?.capture_date || new Date().toISOString().split('T')[0]
+    },
+    processing_time_ms: result.processing_time_ms
+  };
+
   // Update with AI results
   await update(appRef, {
     status: 'ai_completed',
-    aiResult: result,
+    aiResult: cleanAiResult,
     updatedAt: new Date().toISOString()
   });
 };
@@ -129,7 +161,7 @@ export const getUserApplications = (
   const appsRef = ref(database, 'applications');
   const userAppsQuery = query(appsRef, orderByChild('userId'), equalTo(userId));
   
-  const listener = onValue(userAppsQuery, (snapshot) => {
+  onValue(userAppsQuery, (snapshot) => {
     const apps: Application[] = [];
     snapshot.forEach((child) => {
       apps.push({ id: child.key!, ...child.val() });
@@ -147,7 +179,7 @@ export const getAllApplications = (
 ): () => void => {
   const appsRef = ref(database, 'applications');
   
-  const listener = onValue(appsRef, (snapshot) => {
+  onValue(appsRef, (snapshot) => {
     const apps: Application[] = [];
     snapshot.forEach((child) => {
       apps.push({ id: child.key!, ...child.val() });
