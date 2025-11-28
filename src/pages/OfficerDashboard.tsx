@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Application, getAllApplications, reviewApplication, processApplication } from '@/lib/applicationService';
+import { exportAllApplicationsJSON, exportApplicationsCSV, exportApplicationJSON } from '@/lib/exportUtils';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ApplicationCard from '@/components/ApplicationCard';
+import ImageZoomModal from '@/components/ImageZoomModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -22,7 +24,11 @@ import {
   Zap,
   Eye,
   ThumbsUp,
-  ThumbsDown
+  ThumbsDown,
+  Download,
+  FileJson,
+  FileSpreadsheet,
+  ZoomIn
 } from 'lucide-react';
 
 const OfficerDashboard = () => {
@@ -39,6 +45,7 @@ const OfficerDashboard = () => {
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
+  const [showImageZoom, setShowImageZoom] = useState(false);
 
   useEffect(() => {
     if (!authLoading && (!user || userProfile?.role !== 'officer')) {
@@ -116,6 +123,46 @@ const OfficerDashboard = () => {
     }
   };
 
+  const handleExportJSON = () => {
+    if (filteredApps.length === 0) {
+      toast({
+        title: 'No Data',
+        description: 'No applications to export.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    exportAllApplicationsJSON(filteredApps);
+    toast({
+      title: 'Export Complete',
+      description: `Exported ${filteredApps.length} applications as JSON.`,
+    });
+  };
+
+  const handleExportCSV = () => {
+    if (filteredApps.length === 0) {
+      toast({
+        title: 'No Data',
+        description: 'No applications to export.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    exportApplicationsCSV(filteredApps);
+    toast({
+      title: 'Export Complete',
+      description: `Exported ${filteredApps.length} applications as CSV.`,
+    });
+  };
+
+  const handleExportSingleJSON = (app: Application) => {
+    exportApplicationJSON(app);
+    toast({
+      title: 'Export Complete',
+      description: `Exported verification result for ${app.sampleId}.`,
+    });
+  };
+
   const stats = {
     total: applications.length,
     pending: applications.filter(a => a.status === 'pending').length,
@@ -140,15 +187,29 @@ const OfficerDashboard = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-3 rounded-lg solar-gradient">
-            <Shield className="h-8 w-8 text-primary-foreground" />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-lg solar-gradient">
+              <Shield className="h-8 w-8 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">Officer Dashboard</h1>
+              <p className="text-muted-foreground">
+                Review and approve solar verification applications
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold">Officer Dashboard</h1>
-            <p className="text-muted-foreground">
-              Review and approve solar verification applications
-            </p>
+          
+          {/* Export Buttons */}
+          <div className="flex gap-2">
+            <Button variant="outline" className="gap-2" onClick={handleExportJSON}>
+              <FileJson className="h-4 w-4" />
+              Export JSON
+            </Button>
+            <Button variant="outline" className="gap-2" onClick={handleExportCSV}>
+              <FileSpreadsheet className="h-4 w-4" />
+              Export CSV
+            </Button>
           </div>
         </div>
 
@@ -326,27 +387,73 @@ const OfficerDashboard = () => {
                       <p className="text-muted-foreground">Region</p>
                       <p className="font-semibold">{selectedApp.region}</p>
                     </div>
+                    {selectedApp.installationType && (
+                      <div>
+                        <p className="text-muted-foreground">Installation Type</p>
+                        <p className="font-semibold">{selectedApp.installationType}</p>
+                      </div>
+                    )}
+                    {selectedApp.systemCapacity > 0 && (
+                      <div>
+                        <p className="text-muted-foreground">System Capacity</p>
+                        <p className="font-semibold">{selectedApp.systemCapacity} kW</p>
+                      </div>
+                    )}
+                    {selectedApp.panelBrand && (
+                      <div>
+                        <p className="text-muted-foreground">Panel Brand</p>
+                        <p className="font-semibold">{selectedApp.panelBrand}</p>
+                      </div>
+                    )}
+                    {selectedApp.installerCompany && (
+                      <div>
+                        <p className="text-muted-foreground">Installer</p>
+                        <p className="font-semibold">{selectedApp.installerCompany}</p>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Image */}
+                  {/* Image with Zoom */}
                   {selectedApp.imageUrl && (
                     <div>
                       <p className="text-sm text-muted-foreground mb-2">Rooftop Image</p>
-                      <img 
-                        src={selectedApp.imageUrl} 
-                        alt="Rooftop"
-                        className="w-full h-48 object-cover rounded-lg"
-                      />
+                      <div className="relative group">
+                        <img 
+                          src={selectedApp.imageUrl} 
+                          alt="Rooftop"
+                          className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() => setShowImageZoom(true)}
+                        />
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => setShowImageZoom(true)}
+                        >
+                          <ZoomIn className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   )}
 
                   {/* AI Results */}
                   {selectedApp.aiResult && (
                     <div className="p-4 rounded-lg bg-muted/50">
-                      <h4 className="font-semibold mb-3 flex items-center gap-2">
-                        <Zap className="h-4 w-4 text-primary" />
-                        AI Detection Results
-                      </h4>
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-semibold flex items-center gap-2">
+                          <Zap className="h-4 w-4 text-primary" />
+                          AI Detection Results
+                        </h4>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="gap-1"
+                          onClick={() => handleExportSingleJSON(selectedApp)}
+                        >
+                          <Download className="h-3 w-3" />
+                          JSON
+                        </Button>
+                      </div>
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
                           <p className="text-muted-foreground">Solar Detected</p>
@@ -377,7 +484,7 @@ const OfficerDashboard = () => {
                           </Badge>
                         </div>
                       </div>
-                      {selectedApp.aiResult.qc_notes.length > 0 && (
+                      {selectedApp.aiResult.qc_notes && selectedApp.aiResult.qc_notes.length > 0 && (
                         <div className="mt-3">
                           <p className="text-muted-foreground text-sm mb-1">QC Notes:</p>
                           <ul className="text-sm list-disc list-inside">
@@ -438,12 +545,30 @@ const OfficerDashboard = () => {
                         </Button>
                       </>
                     )}
+                    
+                    {(selectedApp.status === 'approved' || selectedApp.status === 'rejected') && (
+                      <div className="flex-1 text-center py-2">
+                        <Badge 
+                          variant={selectedApp.status === 'approved' ? 'success' : 'destructive'}
+                          className="text-sm"
+                        >
+                          {selectedApp.status === 'approved' ? 'Approved' : 'Rejected'}
+                        </Badge>
+                        {selectedApp.reviewedAt && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            on {new Date(selectedApp.reviewedAt).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Eye className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Select an application to view details</p>
+                <div className="text-center py-12">
+                  <Eye className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-muted-foreground">
+                    Select an application to view details
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -452,6 +577,16 @@ const OfficerDashboard = () => {
       </main>
 
       <Footer />
+
+      {/* Image Zoom Modal */}
+      {selectedApp?.imageUrl && (
+        <ImageZoomModal
+          imageUrl={selectedApp.imageUrl}
+          isOpen={showImageZoom}
+          onClose={() => setShowImageZoom(false)}
+          title={`Rooftop - ${selectedApp.sampleId}`}
+        />
+      )}
     </div>
   );
 };

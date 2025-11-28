@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Application, getApplication } from '@/lib/applicationService';
+import { exportApplicationJSON } from '@/lib/exportUtils';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import ImageZoomModal from '@/components/ImageZoomModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
   Loader2, 
@@ -16,16 +19,22 @@ import {
   Download,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
+  Building2,
+  FileJson,
+  ZoomIn,
+  IndianRupee
 } from 'lucide-react';
 
 const ApplicationDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showImageZoom, setShowImageZoom] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -45,14 +54,12 @@ const ApplicationDetail = () => {
   }, [id, user, navigate]);
 
   const handleDownloadJSON = () => {
-    if (application?.aiResult) {
-      const dataStr = JSON.stringify(application.aiResult, null, 2);
-      const blob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `solar-verification-${application.sampleId}.json`;
-      a.click();
+    if (application) {
+      exportApplicationJSON(application);
+      toast({
+        title: 'Export Complete',
+        description: `Downloaded verification result for ${application.sampleId}.`,
+      });
     }
   };
 
@@ -133,12 +140,12 @@ const ApplicationDetail = () => {
               </div>
             </div>
             
-            {application.aiResult && (
+            <div className="flex gap-2">
               <Button variant="outline" className="gap-2" onClick={handleDownloadJSON}>
-                <Download className="h-4 w-4" />
-                Download JSON
+                <FileJson className="h-4 w-4" />
+                Export JSON
               </Button>
-            )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -174,18 +181,29 @@ const ApplicationDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Image */}
+            {/* Image with Zoom */}
             <Card>
               <CardHeader>
                 <CardTitle>Rooftop Image</CardTitle>
               </CardHeader>
               <CardContent>
                 {application.imageUrl ? (
-                  <img 
-                    src={application.imageUrl} 
-                    alt="Rooftop"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
+                  <div className="relative group">
+                    <img 
+                      src={application.imageUrl} 
+                      alt="Rooftop"
+                      className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                      onClick={() => setShowImageZoom(true)}
+                    />
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => setShowImageZoom(true)}
+                    >
+                      <ZoomIn className="h-4 w-4" />
+                    </Button>
+                  </div>
                 ) : (
                   <div className="w-full h-48 bg-muted rounded-lg flex items-center justify-center">
                     <p className="text-muted-foreground">No image uploaded</p>
@@ -193,6 +211,89 @@ const ApplicationDetail = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Installation Details */}
+            {(application.installationType || application.systemCapacity > 0 || application.installationDate) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-primary" />
+                    Installation Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    {application.installationType && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Type</p>
+                        <p className="font-semibold">{application.installationType}</p>
+                      </div>
+                    )}
+                    {application.installationDate && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Installation Date</p>
+                        <p className="font-semibold">{application.installationDate}</p>
+                      </div>
+                    )}
+                    {application.systemCapacity > 0 && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">System Capacity</p>
+                        <p className="font-semibold">{application.systemCapacity} kW</p>
+                      </div>
+                    )}
+                    {application.subsidyAmount > 0 && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Subsidy Amount</p>
+                        <p className="font-semibold flex items-center gap-1">
+                          <IndianRupee className="h-4 w-4" />
+                          {application.subsidyAmount.toLocaleString('en-IN')}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Equipment Details */}
+            {(application.panelBrand || application.inverterBrand || application.installerCompany || application.electricityProvider) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-primary" />
+                    Equipment & Provider
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    {application.panelBrand && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Panel Brand</p>
+                        <p className="font-semibold">{application.panelBrand}</p>
+                      </div>
+                    )}
+                    {application.inverterBrand && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Inverter Brand</p>
+                        <p className="font-semibold">{application.inverterBrand}</p>
+                      </div>
+                    )}
+                    {application.installerCompany && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Installer Company</p>
+                        <p className="font-semibold">{application.installerCompany}</p>
+                      </div>
+                    )}
+                    {application.electricityProvider && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Electricity Provider</p>
+                        <p className="font-semibold">{application.electricityProvider}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* AI Results */}
             {application.aiResult && (
@@ -234,7 +335,7 @@ const ApplicationDetail = () => {
                     </div>
                   </div>
 
-                  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                       <p className="text-sm text-muted-foreground mb-2">PV Area Estimate</p>
                       <p className="font-semibold">{application.aiResult.pv_area_sqm_est} m²</p>
@@ -245,9 +346,13 @@ const ApplicationDetail = () => {
                         {application.aiResult.qc_status}
                       </Badge>
                     </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-2">Processing Time</p>
+                      <p className="font-semibold">{(application.aiResult.processing_time_ms / 1000).toFixed(2)}s</p>
+                    </div>
                   </div>
 
-                  {application.aiResult.qc_notes.length > 0 && (
+                  {application.aiResult.qc_notes && application.aiResult.qc_notes.length > 0 && (
                     <div className="mt-6">
                       <p className="text-sm text-muted-foreground mb-2">Quality Control Notes</p>
                       <ul className="space-y-1">
@@ -258,6 +363,15 @@ const ApplicationDetail = () => {
                           </li>
                         ))}
                       </ul>
+                    </div>
+                  )}
+
+                  {application.aiResult.bbox_or_mask && (
+                    <div className="mt-6">
+                      <p className="text-sm text-muted-foreground mb-2">Bounding Box Data</p>
+                      <code className="block text-xs bg-muted p-3 rounded overflow-x-auto">
+                        {application.aiResult.bbox_or_mask}
+                      </code>
                     </div>
                   )}
                 </CardContent>
@@ -285,6 +399,16 @@ const ApplicationDetail = () => {
       </main>
 
       <Footer />
+
+      {/* Image Zoom Modal */}
+      {application.imageUrl && (
+        <ImageZoomModal
+          imageUrl={application.imageUrl}
+          isOpen={showImageZoom}
+          onClose={() => setShowImageZoom(false)}
+          title={`Rooftop - ${application.sampleId}`}
+        />
+      )}
     </div>
   );
 };

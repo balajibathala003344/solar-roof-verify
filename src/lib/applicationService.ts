@@ -15,6 +15,16 @@ export interface Application {
   address: string;
   region: string;
   imageUrl: string;
+  // Enhanced fields
+  installationType: string;
+  installationDate: string;
+  systemCapacity: number;
+  installerCompany: string;
+  panelBrand: string;
+  inverterBrand: string;
+  subsidyAmount: number;
+  electricityProvider: string;
+  // Status fields
   status: ApplicationStatus;
   aiResult?: DetectionResult;
   officerNotes: string;
@@ -34,18 +44,28 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
+export interface ApplicationData {
+  sampleId: string;
+  latitude: number;
+  longitude: number;
+  address?: string;
+  region: string;
+  imageFile?: File;
+  installationType?: string;
+  installationDate?: string;
+  systemCapacity?: number;
+  installerCompany?: string;
+  panelBrand?: string;
+  inverterBrand?: string;
+  subsidyAmount?: number;
+  electricityProvider?: string;
+}
+
 export const createApplication = async (
   userId: string,
   userName: string,
   userEmail: string,
-  data: {
-    sampleId: string;
-    latitude: number;
-    longitude: number;
-    address?: string;
-    region: string;
-    imageFile?: File;
-  }
+  data: ApplicationData
 ): Promise<string> => {
   let imageUrl = '';
 
@@ -74,6 +94,16 @@ export const createApplication = async (
     address: data.address || '',
     region: data.region,
     imageUrl,
+    // Enhanced fields
+    installationType: data.installationType || '',
+    installationDate: data.installationDate || '',
+    systemCapacity: data.systemCapacity || 0,
+    installerCompany: data.installerCompany || '',
+    panelBrand: data.panelBrand || '',
+    inverterBrand: data.inverterBrand || '',
+    subsidyAmount: data.subsidyAmount || 0,
+    electricityProvider: data.electricityProvider || '',
+    // Status fields
     status: 'pending' as ApplicationStatus,
     officerNotes: '',
     reviewedBy: '',
@@ -84,6 +114,23 @@ export const createApplication = async (
 
   await set(newAppRef, application);
   return newAppRef.key!;
+};
+
+// Create batch applications from CSV
+export const createBatchApplications = async (
+  userId: string,
+  userName: string,
+  userEmail: string,
+  batchData: Omit<ApplicationData, 'imageFile'>[]
+): Promise<string[]> => {
+  const applicationIds: string[] = [];
+  
+  for (const data of batchData) {
+    const id = await createApplication(userId, userName, userEmail, data);
+    applicationIds.push(id);
+  }
+  
+  return applicationIds;
 };
 
 export const processApplication = async (applicationId: string): Promise<void> => {
