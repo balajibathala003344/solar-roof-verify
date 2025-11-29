@@ -70,7 +70,7 @@ const About = () => {
           <div className="container mx-auto px-4 relative">
             <div className="max-w-3xl mx-auto text-center animate-slide-up">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                About <span className="text-gradient-solar">PM Surya Ghar</span>
+                About <span className="text-primary">PM Surya Ghar</span>
               </h1>
               <p className="text-lg text-foreground/80">
                 PM Surya Ghar: Muft Bijli Yojana is India's ambitious initiative to provide 
@@ -87,7 +87,7 @@ const About = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="text-3xl font-bold mb-6">
-                  The <span className="text-gradient-solar">Scheme</span>
+                  The <span className="text-primary">Scheme</span>
                 </h2>
                 <div className="space-y-4 text-foreground/70">
                   <p>
@@ -128,7 +128,7 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center mb-12">
               <h2 className="text-3xl font-bold mb-4">
-                The Verification <span className="text-gradient-solar">Challenge</span>
+                The Verification <span className="text-primary">Challenge</span>
               </h2>
               <p className="text-foreground/70">
                 Governance requires verifying rooftop solar installations to ensure subsidies 
@@ -148,7 +148,7 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold mb-4">
-                Our AI <span className="text-gradient-solar">Capabilities</span>
+                Our AI <span className="text-primary">Capabilities</span>
               </h2>
               <p className="text-foreground/70 max-w-2xl mx-auto">
                 We use advanced computer vision and machine learning to provide accurate, 
@@ -177,7 +177,7 @@ const About = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl font-bold mb-8 text-center">
-                Sample <span className="text-gradient-solar">Output</span>
+                Sample <span className="text-primary">Output</span>
               </h2>
               
               <Card className="overflow-hidden">

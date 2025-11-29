@@ -136,11 +136,6 @@
     background: var(--gradient-hero);
   }
 
-  .text-gradient-solar {
-    @apply bg-clip-text text-transparent;
-    background: var(--gradient-solar);
-  }
-
   .shadow-solar {
     box-shadow: var(--shadow-solar);
   }

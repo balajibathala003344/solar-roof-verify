@@ -43,7 +43,7 @@ const Navbar = () => {
               <Sun className="h-6 w-6 text-primary-foreground" />
             </div>
             <span className="font-bold text-lg hidden sm:block">
-              <span className="text-gradient-solar">TopRoof</span>
+              <span className="text-primary">TopRoof</span>
               <span className="text-foreground"> Solar</span>
             </span>
           </Link>
