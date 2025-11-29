@@ -84,7 +84,7 @@ const Contact = () => {
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 Get in <span className="text-gradient-solar">Touch</span>
               </h1>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-lg text-foreground/80">
                 Have questions about solar verification? We're here to help.
               </p>
             </div>
@@ -174,7 +174,7 @@ const Contact = () => {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-bold mb-4">Contact Information</h2>
-                  <p className="text-muted-foreground mb-6">
+                  <p className="text-foreground/70 mb-6">
                     Reach out to us through any of the following channels. 
                     Our support team is available Monday through Saturday.
                   </p>
@@ -221,7 +221,7 @@ const Contact = () => {
             <h2 className="text-2xl font-bold mb-4">
               Frequently Asked <span className="text-gradient-solar">Questions</span>
             </h2>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+            <p className="text-foreground/70 mb-6 max-w-2xl mx-auto">
               Check our FAQ section for quick answers to common questions about the 
               PM Surya Ghar scheme and solar verification process.
             </p>

@@ -66,11 +66,19 @@ const OfficerDashboard = () => {
     
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(app => 
-        app.sampleId.toLowerCase().includes(term) ||
-        app.userName.toLowerCase().includes(term) ||
-        app.userEmail.toLowerCase().includes(term)
-      );
+      filtered = filtered.filter(app => {
+        const sampleId = app.sampleId?.toLowerCase() || '';
+        const userName = app.userName?.toLowerCase() || '';
+        const userEmail = app.userEmail?.toLowerCase() || '';
+        const address = app.address?.toLowerCase() || '';
+        const region = app.region?.toLowerCase() || '';
+        
+        return sampleId.includes(term) ||
+          userName.includes(term) ||
+          userEmail.includes(term) ||
+          address.includes(term) ||
+          region.includes(term);
+      });
     }
     
     if (statusFilter !== 'all') {

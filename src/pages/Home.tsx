@@ -74,7 +74,7 @@ const Home = () => {
                 <span className="text-foreground">Verification System</span>
               </h1>
               
-              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              <p className="text-lg md:text-xl text-foreground/80 mb-8 max-w-2xl leading-relaxed">
                 AI-powered remote verification of rooftop solar installations. 
                 Ensuring genuine beneficiaries receive subsidies under India's largest solar mission.
               </p>
@@ -122,7 +122,7 @@ const Home = () => {
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 How It <span className="text-gradient-solar">Works</span>
               </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-foreground/70 max-w-2xl mx-auto">
                 Our AI-powered system provides fast, accurate, and auditable verification 
                 of rooftop solar installations across India.
               </p>

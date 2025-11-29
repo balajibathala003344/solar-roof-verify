@@ -72,7 +72,7 @@ const About = () => {
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 About <span className="text-gradient-solar">PM Surya Ghar</span>
               </h1>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-lg text-foreground/80">
                 PM Surya Ghar: Muft Bijli Yojana is India's ambitious initiative to provide 
                 free electricity to households through rooftop solar installations, 
                 launched by Prime Minister Narendra Modi on February 15, 2024.
@@ -89,7 +89,7 @@ const About = () => {
                 <h2 className="text-3xl font-bold mb-6">
                   The <span className="text-gradient-solar">Scheme</span>
                 </h2>
-                <div className="space-y-4 text-muted-foreground">
+                <div className="space-y-4 text-foreground/70">
                   <p>
                     Under this scheme, households are provided subsidies to install solar 
                     panels on their rooftops, enabling them to generate their own electricity 
@@ -130,7 +130,7 @@ const About = () => {
               <h2 className="text-3xl font-bold mb-4">
                 The Verification <span className="text-gradient-solar">Challenge</span>
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-foreground/70">
                 Governance requires verifying rooftop solar installations to ensure subsidies 
                 reach genuine beneficiaries. Our AI-powered system answers a simple question:
               </p>
@@ -150,7 +150,7 @@ const About = () => {
               <h2 className="text-3xl font-bold mb-4">
                 Our AI <span className="text-gradient-solar">Capabilities</span>
               </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-foreground/70 max-w-2xl mx-auto">
                 We use advanced computer vision and machine learning to provide accurate, 
                 auditable solar panel detection across India's diverse roof types.
               </p>
