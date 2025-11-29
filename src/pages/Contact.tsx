@@ -82,7 +82,7 @@ const Contact = () => {
           <div className="container mx-auto px-4 relative">
             <div className="max-w-2xl mx-auto text-center animate-slide-up">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                Get in <span className="text-gradient-solar">Touch</span>
+                Get in <span className="text-primary">Touch</span>
               </h1>
               <p className="text-lg text-foreground/80">
                 Have questions about solar verification? We're here to help.
@@ -219,7 +219,7 @@ const Contact = () => {
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-2xl font-bold mb-4">
-              Frequently Asked <span className="text-gradient-solar">Questions</span>
+              Frequently Asked <span className="text-primary">Questions</span>
             </h2>
             <p className="text-foreground/70 mb-6 max-w-2xl mx-auto">
               Check our FAQ section for quick answers to common questions about the 

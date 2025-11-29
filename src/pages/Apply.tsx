@@ -303,7 +303,7 @@ const Apply = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">
-              Submit <span className="text-gradient-solar">Verification</span>
+              Submit <span className="text-primary">Verification</span>
             </h1>
             <p className="text-muted-foreground">
               Enter your rooftop details for solar panel verification

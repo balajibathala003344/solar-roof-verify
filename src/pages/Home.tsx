@@ -69,7 +69,7 @@ const Home = () => {
               </div>
               
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                <span className="text-gradient-solar">Smart Solar</span>
+                <span className="text-primary">Smart Solar</span>
                 <br />
                 <span className="text-foreground">Verification System</span>
               </h1>
@@ -104,7 +104,7 @@ const Home = () => {
                 <Card key={index} variant="glass" className="text-center p-8">
                   <CardContent className="p-0">
                     <stat.icon className="h-12 w-12 mx-auto mb-4 text-primary" />
-                    <div className="text-4xl font-bold text-gradient-solar mb-2">
+                    <div className="text-4xl font-bold text-primary mb-2">
                       {stat.value}
                     </div>
                     <div className="text-muted-foreground">{stat.label}</div>
@@ -120,7 +120,7 @@ const Home = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                How It <span className="text-gradient-solar">Works</span>
+                How It <span className="text-primary">Works</span>
               </h2>
               <p className="text-foreground/70 max-w-2xl mx-auto">
                 Our AI-powered system provides fast, accurate, and auditable verification 
@@ -153,7 +153,7 @@ const Home = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Verification <span className="text-gradient-solar">Process</span>
+                Verification <span className="text-primary">Process</span>
               </h2>
             </div>
             
