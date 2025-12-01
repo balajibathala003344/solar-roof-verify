@@ -67,19 +67,19 @@ TopRoof Solar ensures transparent, audit-ready, and remote verification of rooft
 ## 📸 Screenshots
 
 ### 🏠 Landing Page
-![Home](/screenshots/home.png)
+![Home](/screenshots/s1.png)
 
 ### 👤 User Dashboard
-![Dashboard](/screenshots/user-dashboard.png)
+![Dashboard](/screenshots/u1.png)
 
 ### 📝 Application Form
-![Submit](/screenshots/submit.png)
+![Submit](/screenshots/ua.png)
 
 ### 🛂 Officer Dashboard
-![Officer](/screenshots/officer-dashboard.png)
+![Officer](/screenshots/o1.png)
 
 ### 🔍 AI Detection & QC Results
-![results](/screenshots/ai-results.png)
+![results](/screenshots/or.png)
 
 (Images stored under `/screenshots` in repo)
 
