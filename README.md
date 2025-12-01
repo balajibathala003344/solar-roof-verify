@@ -69,17 +69,27 @@ TopRoof Solar ensures transparent, audit-ready, and remote verification of rooft
 ### 🏠 Landing Page
 ![Home](/screenshots/s1.png)
 
+---
+
 ### 👤 User Dashboard
 ![Dashboard](/screenshots/u1.png)
+
+---
 
 ### 📝 Application Form
 ![Submit](/screenshots/ua.png)
 
+---
+
 ### 🛂 Officer Dashboard
 ![Officer](/screenshots/o1.png)
 
+---
+
 ### 🔍 AI Detection & QC Results
 ![results](/screenshots/or.png)
+
+---
 
 (Images stored under `/screenshots` in repo)
 
@@ -91,3 +101,16 @@ git clone https://github.com/balajibathala003344/solar-roof-verify.git
 cd solar-roof-verify
 npm install
 npm run dev
+
+---
+
+Team & Developers – FutureLeaf
+
+💎 K. Vijaya
+🚀 M. Jyothi Reddy
+🧠 B. Balaji
+
+Team Leader Email
+
+📩 239x1a3335@gprec.ac.in
+
