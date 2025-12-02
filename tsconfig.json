@@ -1,11 +1,21 @@
 {
   "files": [],
-  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
+  // Project-level references
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+
   "compilerOptions": {
+    // Base folder reference
     "baseUrl": ".",
+
+    // Path alias for imports (@ → src)
     "paths": {
       "@/*": ["./src/*"]
     },
+
+    // Type settings
     "noImplicitAny": false,
     "noUnusedParameters": false,
     "skipLibCheck": true,
