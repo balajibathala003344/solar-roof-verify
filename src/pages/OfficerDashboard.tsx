@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ApplicationCard from '@/components/ApplicationCard';
 import ImageZoomModal from '@/components/ImageZoomModal';
+import SolarDetectionOverlay from '@/components/SolarDetectionOverlay';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -421,21 +422,21 @@ const OfficerDashboard = () => {
                     )}
                   </div>
 
-                  {/* Image with Zoom */}
+                  {/* Image with AI Detection Overlay */}
                   {selectedApp.imageUrl && (
                     <div>
-                      <p className="text-sm text-muted-foreground mb-2">Rooftop Image</p>
+                      <p className="text-sm text-muted-foreground mb-2">AI Detection View</p>
                       <div className="relative group">
-                        <img 
-                          src={selectedApp.imageUrl} 
-                          alt="Rooftop"
-                          className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                          onClick={() => setShowImageZoom(true)}
+                        <SolarDetectionOverlay
+                          imageUrl={selectedApp.imageUrl}
+                          aiResult={selectedApp.aiResult}
+                          className="w-full h-64"
+                          isProcessing={processingId === selectedApp.id}
                         />
                         <Button
                           variant="secondary"
                           size="icon"
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-30"
                           onClick={() => setShowImageZoom(true)}
                         >
                           <ZoomIn className="h-4 w-4" />
