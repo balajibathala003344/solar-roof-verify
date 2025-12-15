@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ImageZoomModal from '@/components/ImageZoomModal';
 import SatelliteImageFetcher from '@/components/SatelliteImageFetcher';
+import MapLocationPicker from '@/components/MapLocationPicker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,6 +71,15 @@ const Apply = () => {
   // Handle satellite image fetched
   const handleSatelliteImageFetched = useCallback((url: string) => {
     setSatelliteImageUrl(url);
+  }, []);
+
+  // Handle map location selection
+  const handleLocationSelect = useCallback((lat: number, lng: number) => {
+    setFormData(prev => ({
+      ...prev,
+      latitude: lat.toFixed(6),
+      longitude: lng.toFixed(6),
+    }));
   }, []);
   
   const [formData, setFormData] = useState({
@@ -363,6 +373,13 @@ const Apply = () => {
                           <p className="text-sm text-destructive">{errors.sampleId}</p>
                         )}
                       </div>
+
+                      {/* Map Location Picker */}
+                      <MapLocationPicker
+                        latitude={formData.latitude ? parseFloat(formData.latitude) : null}
+                        longitude={formData.longitude ? parseFloat(formData.longitude) : null}
+                        onLocationSelect={handleLocationSelect}
+                      />
 
                       {/* Coordinates */}
                       <div className="grid grid-cols-2 gap-4">
