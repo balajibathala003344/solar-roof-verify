@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { createApplication, processApplication, createBatchApplications } from '@/lib/applicationService';
@@ -6,6 +6,7 @@ import { parseCSV, CSVRow } from '@/lib/exportUtils';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ImageZoomModal from '@/components/ImageZoomModal';
+import SatelliteImageFetcher from '@/components/SatelliteImageFetcher';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,7 +37,8 @@ import {
   Zap,
   IndianRupee,
   ZoomIn,
-  X
+  X,
+  Satellite
 } from 'lucide-react';
 import { z } from 'zod';
 
@@ -58,11 +60,17 @@ const Apply = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showImageZoom, setShowImageZoom] = useState(false);
+  const [satelliteImageUrl, setSatelliteImageUrl] = useState<string | null>(null);
   
   // CSV batch upload
   const [csvData, setCsvData] = useState<CSVRow[]>([]);
   const [csvFileName, setCsvFileName] = useState('');
   const [batchLoading, setBatchLoading] = useState(false);
+
+  // Handle satellite image fetched
+  const handleSatelliteImageFetched = useCallback((url: string) => {
+    setSatelliteImageUrl(url);
+  }, []);
   
   const [formData, setFormData] = useState({
     sampleId: '',
@@ -427,6 +435,13 @@ const Apply = () => {
                           )}
                         </div>
                       </div>
+                      
+                      {/* Satellite Imagery Section */}
+                      <SatelliteImageFetcher
+                        latitude={formData.latitude ? parseFloat(formData.latitude) : null}
+                        longitude={formData.longitude ? parseFloat(formData.longitude) : null}
+                        onImageFetched={handleSatelliteImageFetched}
+                      />
                     </div>
 
                     {/* Installation Details Section */}
