@@ -6,6 +6,7 @@ import { exportApplicationJSON } from '@/lib/exportUtils';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ImageZoomModal from '@/components/ImageZoomModal';
+import SolarDetectionOverlay from '@/components/SolarDetectionOverlay';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -181,24 +182,26 @@ const ApplicationDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Image with Zoom */}
+            {/* AI Detection View */}
             <Card>
               <CardHeader>
-                <CardTitle>Rooftop Image</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-primary" />
+                  AI Detection View
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {application.imageUrl ? (
                   <div className="relative group">
-                    <img 
-                      src={application.imageUrl} 
-                      alt="Rooftop"
-                      className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                      onClick={() => setShowImageZoom(true)}
+                    <SolarDetectionOverlay
+                      imageUrl={application.imageUrl}
+                      aiResult={application.aiResult}
+                      className="w-full h-64"
                     />
                     <Button
                       variant="secondary"
                       size="icon"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-30"
                       onClick={() => setShowImageZoom(true)}
                     >
                       <ZoomIn className="h-4 w-4" />

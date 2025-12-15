@@ -162,6 +162,15 @@
     animation: fadeIn 0.6s ease-out;
   }
 
+  .animate-scan {
+    animation: scan 2s ease-in-out infinite;
+  }
+
+  .animate-fadeIn {
+    animation: fadeInBox 0.4s ease-out forwards;
+    opacity: 0;
+  }
+
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-20px); }
@@ -181,6 +190,34 @@
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+  }
+
+  @keyframes fadeInBox {
+    from { 
+      opacity: 0; 
+      transform: scale(0.8);
+    }
+    to { 
+      opacity: 1; 
+      transform: scale(1);
+    }
+  }
+
+  @keyframes scan {
+    0% { 
+      top: 0;
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% { 
+      top: 100%;
+      opacity: 0;
+    }
   }
 
   @keyframes shimmer {

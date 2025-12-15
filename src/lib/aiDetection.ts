@@ -88,12 +88,28 @@ export const runSolarDetection = async (
 
 const generateMockBboxString = (panelCount: number): string => {
   const boxes: string[] = [];
-  for (let i = 0; i < Math.min(panelCount, 5); i++) {
-    const x = Math.floor(100 + Math.random() * 400);
-    const y = Math.floor(100 + Math.random() * 400);
-    const w = Math.floor(50 + Math.random() * 100);
-    const h = Math.floor(30 + Math.random() * 60);
-    boxes.push(`[${x},${y},${w},${h}]`);
+  const gridCols = Math.ceil(Math.sqrt(panelCount));
+  const gridRows = Math.ceil(panelCount / gridCols);
+  
+  // Create realistic grid-like panel layout
+  const startX = 80 + Math.random() * 100;
+  const startY = 80 + Math.random() * 100;
+  const panelWidth = 60 + Math.random() * 40;
+  const panelHeight = 35 + Math.random() * 25;
+  const gapX = 8 + Math.random() * 12;
+  const gapY = 6 + Math.random() * 10;
+  
+  let count = 0;
+  for (let row = 0; row < gridRows && count < panelCount; row++) {
+    for (let col = 0; col < gridCols && count < panelCount; col++) {
+      const x = Math.floor(startX + col * (panelWidth + gapX) + (Math.random() - 0.5) * 8);
+      const y = Math.floor(startY + row * (panelHeight + gapY) + (Math.random() - 0.5) * 6);
+      const w = Math.floor(panelWidth + (Math.random() - 0.5) * 10);
+      const h = Math.floor(panelHeight + (Math.random() - 0.5) * 8);
+      const conf = (0.82 + Math.random() * 0.17).toFixed(2);
+      boxes.push(`[${x},${y},${w},${h},${conf}]`);
+      count++;
+    }
   }
   return boxes.join(';');
 };
