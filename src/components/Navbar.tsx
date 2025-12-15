@@ -11,7 +11,8 @@ import {
   Phone, 
   LogOut, 
   User, 
-  Shield 
+  Shield,
+  BarChart3
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -68,6 +69,12 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-3">
             {user && userProfile ? (
               <>
+                <Link to="/analytics">
+                  <Button variant={isActive('/analytics') ? "default" : "ghost"} size="sm" className="gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Analytics
+                  </Button>
+                </Link>
                 <Link to={userProfile.role === 'officer' ? '/officer-dashboard' : '/dashboard'}>
                   <Button variant="outline" size="sm" className="gap-2">
                     {userProfile.role === 'officer' ? (
@@ -130,6 +137,18 @@ const Navbar = () => {
               
               {user && userProfile ? (
                 <>
+                  <Link 
+                    to="/analytics"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Button 
+                      variant={isActive('/analytics') ? "default" : "ghost"} 
+                      className="w-full justify-start gap-2"
+                    >
+                      <BarChart3 className="h-4 w-4" />
+                      Analytics
+                    </Button>
+                  </Link>
                   <Link 
                     to={userProfile.role === 'officer' ? '/officer-dashboard' : '/dashboard'}
                     onClick={() => setMobileMenuOpen(false)}
