@@ -13,6 +13,7 @@ import Apply from "./pages/Apply";
 import UserDashboard from "./pages/UserDashboard";
 import OfficerDashboard from "./pages/OfficerDashboard";
 import ApplicationDetail from "./pages/ApplicationDetail";
+import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/dashboard" element={<UserDashboard />} />
             <Route path="/officer-dashboard" element={<OfficerDashboard />} />
             <Route path="/application/:id" element={<ApplicationDetail />} />
+            <Route path="/analytics" element={<Analytics />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
