@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Application, getAllApplications } from '@/lib/applicationService';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import RegionHeatmap from '@/components/RegionHeatmap';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -288,6 +289,11 @@ const Analytics = () => {
               <p className="text-xs text-rose-600 dark:text-rose-500">Avg Confidence</p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Region Heatmap */}
+        <div className="mb-8">
+          <RegionHeatmap applications={applications} />
         </div>
 
         {/* Charts Grid */}
