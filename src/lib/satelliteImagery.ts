@@ -113,3 +113,89 @@ export const validateMapboxToken = async (token: string): Promise<boolean> => {
     return false;
   }
 };
+
+export interface GeocodingResult {
+  latitude: number;
+  longitude: number;
+  placeName: string;
+  region?: string;
+}
+
+/**
+ * Geocode an address to coordinates using Mapbox Geocoding API
+ */
+export const geocodeAddress = async (address: string): Promise<GeocodingResult | null> => {
+  const token = getMapboxToken();
+  if (!token) return null;
+
+  try {
+    const encodedAddress = encodeURIComponent(address);
+    // Focus search on India with country filter
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${token}&country=IN&limit=1`;
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error('Geocoding request failed:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    
+    if (!data.features || data.features.length === 0) {
+      return null;
+    }
+
+    const feature = data.features[0];
+    const [longitude, latitude] = feature.center;
+    
+    // Extract region from context
+    const regionContext = feature.context?.find((c: any) => 
+      c.id.startsWith('region') || c.id.startsWith('state')
+    );
+    
+    return {
+      latitude,
+      longitude,
+      placeName: feature.place_name,
+      region: regionContext?.text,
+    };
+  } catch (error) {
+    console.error('Geocoding error:', error);
+    return null;
+  }
+};
+
+/**
+ * Search for address suggestions using Mapbox Geocoding API
+ */
+export const searchAddresses = async (query: string): Promise<GeocodingResult[]> => {
+  const token = getMapboxToken();
+  if (!token || query.length < 3) return [];
+
+  try {
+    const encodedQuery = encodeURIComponent(query);
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedQuery}.json?access_token=${token}&country=IN&limit=5&types=address,place,locality,neighborhood`;
+    
+    const response = await fetch(url);
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    
+    return (data.features || []).map((feature: any) => {
+      const [longitude, latitude] = feature.center;
+      const regionContext = feature.context?.find((c: any) => 
+        c.id.startsWith('region') || c.id.startsWith('state')
+      );
+      
+      return {
+        latitude,
+        longitude,
+        placeName: feature.place_name,
+        region: regionContext?.text,
+      };
+    });
+  } catch (error) {
+    console.error('Address search error:', error);
+    return [];
+  }
+};

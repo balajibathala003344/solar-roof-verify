@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import ImageZoomModal from '@/components/ImageZoomModal';
 import SatelliteImageFetcher from '@/components/SatelliteImageFetcher';
 import MapLocationPicker from '@/components/MapLocationPicker';
+import { geocodeAddress, searchAddresses, GeocodingResult, hasMapboxToken } from '@/lib/satelliteImagery';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,7 +40,8 @@ import {
   IndianRupee,
   ZoomIn,
   X,
-  Satellite
+  Satellite,
+  Search
 } from 'lucide-react';
 import { z } from 'zod';
 
@@ -63,6 +65,12 @@ const Apply = () => {
   const [showImageZoom, setShowImageZoom] = useState(false);
   const [satelliteImageUrl, setSatelliteImageUrl] = useState<string | null>(null);
   
+  // Geocoding state
+  const [addressSearch, setAddressSearch] = useState('');
+  const [addressSuggestions, setAddressSuggestions] = useState<GeocodingResult[]>([]);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  
   // CSV batch upload
   const [csvData, setCsvData] = useState<CSVRow[]>([]);
   const [csvFileName, setCsvFileName] = useState('');
@@ -81,6 +89,58 @@ const Apply = () => {
       longitude: lng.toFixed(6),
     }));
   }, []);
+
+  // Handle address search input change
+  const handleAddressSearchChange = useCallback(async (value: string) => {
+    setAddressSearch(value);
+    if (value.length >= 3 && hasMapboxToken()) {
+      const suggestions = await searchAddresses(value);
+      setAddressSuggestions(suggestions);
+      setShowSuggestions(suggestions.length > 0);
+    } else {
+      setAddressSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, []);
+
+  // Handle selecting a geocoding suggestion
+  const handleSelectSuggestion = useCallback((result: GeocodingResult) => {
+    setFormData(prev => ({
+      ...prev,
+      latitude: result.latitude.toFixed(6),
+      longitude: result.longitude.toFixed(6),
+      address: result.placeName,
+      region: result.region || prev.region,
+    }));
+    setAddressSearch(result.placeName);
+    setShowSuggestions(false);
+    setAddressSuggestions([]);
+    toast({
+      title: 'Location Found',
+      description: `Coordinates set to ${result.latitude.toFixed(4)}, ${result.longitude.toFixed(4)}`,
+    });
+  }, [toast]);
+
+  // Handle geocode button click
+  const handleGeocodeAddress = useCallback(async () => {
+    if (!addressSearch || !hasMapboxToken()) return;
+    
+    setIsGeocoding(true);
+    try {
+      const result = await geocodeAddress(addressSearch);
+      if (result) {
+        handleSelectSuggestion(result);
+      } else {
+        toast({
+          title: 'Address Not Found',
+          description: 'Could not find coordinates for the given address.',
+          variant: 'destructive',
+        });
+      }
+    } finally {
+      setIsGeocoding(false);
+    }
+  }, [addressSearch, handleSelectSuggestion, toast]);
   
   const [formData, setFormData] = useState({
     sampleId: '',
@@ -420,6 +480,60 @@ const Apply = () => {
                             <p className="text-sm text-destructive">{errors.longitude}</p>
                           )}
                         </div>
+                      </div>
+
+                      {/* Address Search with Geocoding */}
+                      <div className="space-y-2">
+                        <Label htmlFor="addressSearch">Search Address (Auto-fill Coordinates)</Label>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="addressSearch"
+                            placeholder="Type an address to search..."
+                            className="pl-10 pr-24"
+                            value={addressSearch}
+                            onChange={(e) => handleAddressSearchChange(e.target.value)}
+                            onFocus={() => addressSuggestions.length > 0 && setShowSuggestions(true)}
+                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="secondary"
+                            className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8"
+                            onClick={handleGeocodeAddress}
+                            disabled={!addressSearch || isGeocoding || !hasMapboxToken()}
+                          >
+                            {isGeocoding ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              'Geocode'
+                            )}
+                          </Button>
+                          
+                          {/* Suggestions dropdown */}
+                          {showSuggestions && addressSuggestions.length > 0 && (
+                            <div className="absolute z-50 w-full mt-1 bg-card border-2 border-input rounded-lg shadow-lg max-h-60 overflow-auto">
+                              {addressSuggestions.map((suggestion, index) => (
+                                <button
+                                  key={index}
+                                  type="button"
+                                  className="w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors border-b border-border/50 last:border-b-0"
+                                  onClick={() => handleSelectSuggestion(suggestion)}
+                                >
+                                  <p className="text-sm font-medium truncate">{suggestion.placeName}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {suggestion.latitude.toFixed(4)}, {suggestion.longitude.toFixed(4)}
+                                    {suggestion.region && ` • ${suggestion.region}`}
+                                  </p>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Start typing to search for an address. Select a suggestion or click Geocode to auto-fill coordinates.
+                        </p>
                       </div>
 
                       {/* Address & Region */}
